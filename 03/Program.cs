@@ -9,6 +9,7 @@ namespace _03
         static StreamReader sr;
         static string[] input;
         static readonly Dictionary<(int row, int column), bool> symbols = [];
+        static readonly HashSet<(int row, int startX, int endX, int number)> partNumbers = [];
         static int partNumberSum = 0;
         static int gearRatioSum = 0;
 
@@ -76,12 +77,15 @@ namespace _03
 
                         if (newNum)
                         {
-                            int partNumber = FindPartNumber(iY, iX);
+                            var partNumber = FindPartNumber(iY, iX);
 
-                            partNumberSum += partNumber;
+                            if(partNumbers.Add(partNumber))
+                                partNumberSum += partNumber.number;
+                            else
+                                Console.WriteLine($"{partNumber.number} ({partNumber.startX - partNumber.endX})");
 
                             if (symbol.Value)
-                                gearPartNumbers.Add(partNumber);
+                                gearPartNumbers.Add(partNumber.number);
                             
                             newNum = false;
                         }
@@ -93,7 +97,7 @@ namespace _03
             }
         }
 
-        private static int FindPartNumber(int row, int col)
+        private static (int row, int startX, int endX, int number) FindPartNumber(int row, int col)
         {
             int startX = col, endX = col;
 
@@ -117,7 +121,7 @@ namespace _03
                 shiftedCol++;
             }
 
-            return int.Parse(input[row][startX..(endX + 1)]);
+            return (row, startX, endX, int.Parse(input[row][startX..(endX + 1)]));
         }
     }
 }
